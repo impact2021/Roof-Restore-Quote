@@ -1,0 +1,87 @@
+/* =========================================================
+   Impact Websites – Roof Estimate & Quote
+   Admin settings page styles
+   ========================================================= */
+
+/* ── Page wrapper ───────────────────────────────────────── */
+.irreq-wrap {
+  max-width: 900px;
+}
+
+.irreq-page-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.irreq-page-title .dashicons {
+  color: #db5d33;
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+}
+
+/* ── Shortcode hint ─────────────────────────────────────── */
+.irreq-shortcode-info {
+  background: #f0f6fc;
+  border-left: 4px solid #db5d33;
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.irreq-shortcode-info code {
+  background: #e8f4fc;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+/* ── Settings form ──────────────────────────────────────── */
+.irreq-settings-form .form-table th {
+  width: 240px;
+  padding-top: 12px;
+}
+
+.irreq-settings-form .form-table td {
+  padding: 8px 10px;
+}
+
+/* ── Input sizes ────────────────────────────────────────── */
+.irreq-text-input {
+  width: 100%;
+  max-width: 420px;
+}
+
+.irreq-number-input {
+  width: 100px;
+}
+
+.irreq-textarea {
+  width: 100%;
+  max-width: 420px;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+/* ── Section descriptions ───────────────────────────────── */
+.irreq-section-desc {
+  color: #666;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+/* ── WP Settings Errors - keep the orange accent ───────── */
+.irreq-wrap .notice-success {
+  border-left-color: #db5d33;
+}
+
+/* ── Section headings ───────────────────────────────────── */
+.irreq-settings-form h2 {
+  border-bottom: 2px solid #db5d33;
+  padding-bottom: 6px;
+  color: #1d2327;
+}
