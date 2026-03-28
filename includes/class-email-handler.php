@@ -48,6 +48,7 @@ class IRREQ_Email_Handler {
 		$roof_size = isset( $_POST['roof_size'] ) ? floatval( $_POST['roof_size'] ) : 0;
 		$material  = isset( $_POST['material'] ) ? sanitize_text_field( wp_unslash( $_POST['material'] ) ) : '';
 		$condition = isset( $_POST['condition'] ) ? sanitize_text_field( wp_unslash( $_POST['condition'] ) ) : '';
+		$service   = isset( $_POST['service'] ) ? sanitize_text_field( wp_unslash( $_POST['service'] ) ) : '';
 		$estimate  = isset( $_POST['estimate'] ) ? sanitize_text_field( wp_unslash( $_POST['estimate'] ) ) : '';
 
 		// Basic validation.
@@ -93,7 +94,7 @@ class IRREQ_Email_Handler {
 			'material_label' => $material_label,
 			'condition_label' => $condition_label,
 			'estimate'       => $estimate,
-			'service'        => $settings['service_description'],
+			'service'        => $service,
 		) );
 
 		// Set up email headers.

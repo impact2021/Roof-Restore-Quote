@@ -124,10 +124,14 @@ class IRREQ_Shortcode {
 				</div>
 
 				<div class="rr-quote-group">
-					<label><?php echo esc_html( $s['label_service'] ); ?></label>
-					<input type="text"
-						value="<?php echo esc_attr( $s['service_description'] ); ?>"
-						disabled />
+					<label for="rrService"><?php echo esc_html( $s['label_service'] ); ?></label>
+					<select id="rrService" name="rrService">
+						<option value=""><?php esc_html_e( 'Select service', 'impact-roof-estimate' ); ?></option>
+						<option value="roof_painting"><?php esc_html_e( 'Roof Painting (incl. clean, moss, primer + 2 top coats)', 'impact-roof-estimate' ); ?></option>
+						<option value="roof_wash"><?php esc_html_e( 'Roof Wash &amp; Moss Treatment', 'impact-roof-estimate' ); ?></option>
+						<option value="roof_repairs"><?php esc_html_e( 'Roof Repairs &amp; Patching', 'impact-roof-estimate' ); ?></option>
+						<option value="full_replacement"><?php esc_html_e( 'Full Roof Replacement', 'impact-roof-estimate' ); ?></option>
+					</select>
 				</div>
 			</div>
 

@@ -17,6 +17,7 @@
   var $sizeInput     = $wrap.find('#rrRoofSize');
   var $materialSel   = $wrap.find('#rrRoofMaterial');
   var $conditionSel  = $wrap.find('#rrRoofCondition');
+  var $serviceSel    = $wrap.find('#rrService');
   var $estimateText  = $wrap.find('#rrEstimateText');
   var $nameInput     = $wrap.find('#rrName');
   var $phoneInput    = $wrap.find('#rrPhone');
@@ -92,6 +93,7 @@
     var material  = $materialSel.val();
     var condition = $conditionSel.val();
     var size      = $sizeInput.val();
+    var service   = $serviceSel.find('option:selected').text();
 
     var estimateStr = formatNZD(lastLow) + ' – ' + formatNZD(lastHigh);
 
@@ -113,6 +115,7 @@
       roof_size           : size,
       material            : material,
       condition           : condition,
+      service             : service,
       estimate            : estimateStr,
       cf_turnstile_response: cfToken,
     })
@@ -123,6 +126,7 @@
         $sizeInput.val('');
         $materialSel.val('');
         $conditionSel.val('');
+        $serviceSel.val('');
         $nameInput.val('');
         $phoneInput.val('');
         $emailInput.val('');
