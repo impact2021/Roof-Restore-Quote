@@ -50,6 +50,13 @@ class IRREQ_Admin_Settings {
 			array(),
 			IRREQ_VERSION
 		);
+		wp_enqueue_script(
+			'irreq-admin-builder',
+			IRREQ_PLUGIN_URL . 'assets/js/admin-shortcode-builder.js',
+			array( 'jquery' ),
+			IRREQ_VERSION,
+			true
+		);
 	}
 
 	/**
@@ -433,17 +440,10 @@ class IRREQ_Admin_Settings {
 				<span class="dashicons dashicons-admin-home"></span>
 				<?php esc_html_e( 'Roof Estimate &amp; Quote – Settings', 'impact-roof-estimate' ); ?>
 			</h1>
-			<p class="irreq-shortcode-info">
-				<?php
-				printf(
-					/* translators: %s shortcode tag wrapped in <code> */
-					esc_html__( 'Add the shortcode %s to any page or post to display the estimate form.', 'impact-roof-estimate' ),
-					'<code>[roof_estimate_quote]</code>'
-				);
-				?>
-			</p>
 
 			<?php settings_errors( IRREQ_OPTION_KEY ); ?>
+
+			<?php $this->render_shortcode_builder(); ?>
 
 			<form method="post" action="options.php" class="irreq-settings-form">
 				<?php
@@ -453,6 +453,173 @@ class IRREQ_Admin_Settings {
 				?>
 			</form>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Render the Shortcode Builder panel.
+	 */
+	private function render_shortcode_builder() {
+		$s = irreq_get_settings();
+		// Determine default checked state for optional fields from global settings.
+		$def_address = ! empty( $s['show_address'] );
+		$def_suburb  = ! empty( $s['show_suburb'] );
+		$def_details = ! empty( $s['show_details'] );
+		?>
+		<div class="irreq-builder-panel" id="irreq-shortcode-builder">
+			<h2 class="irreq-builder-heading">
+				<span class="dashicons dashicons-shortcode"></span>
+				<?php esc_html_e( 'Shortcode Builder', 'impact-roof-estimate' ); ?>
+				<button type="button" class="irreq-builder-toggle button button-small" aria-expanded="false">
+					<?php esc_html_e( 'Show / Hide', 'impact-roof-estimate' ); ?>
+				</button>
+			</h2>
+			<div class="irreq-builder-body" style="display:none;">
+				<p class="irreq-section-desc">
+					<?php esc_html_e( 'Configure a custom shortcode below, then copy it into any page or post. Each shortcode can have its own background colour, sections, and visible/required fields.', 'impact-roof-estimate' ); ?>
+				</p>
+
+				<div class="irreq-builder-grid">
+
+					<!-- Col 1: Appearance + Sections -->
+					<div class="irreq-builder-col">
+						<div class="irreq-builder-group">
+							<h3><?php esc_html_e( 'Appearance', 'impact-roof-estimate' ); ?></h3>
+							<table class="irreq-bld-table">
+								<tr>
+									<td><?php esc_html_e( 'Background Colour', 'impact-roof-estimate' ); ?></td>
+									<td><input type="color" id="bldBgColor" value="#0f1724" /></td>
+								</tr>
+								<tr>
+									<td><?php esc_html_e( 'Background Opacity', 'impact-roof-estimate' ); ?></td>
+									<td>
+										<input type="range" id="bldBgOpacity" min="0" max="1" step="0.05" value="1" style="width:120px;" />
+										<span id="bldBgOpacityVal">1</span>
+									</td>
+								</tr>
+							</table>
+						</div>
+
+						<div class="irreq-builder-group">
+							<h3><?php esc_html_e( 'Sections', 'impact-roof-estimate' ); ?></h3>
+							<label class="irreq-bld-check">
+								<input type="checkbox" id="bldShowTitle" checked />
+								<?php esc_html_e( 'Show Title &amp; Subtitle', 'impact-roof-estimate' ); ?>
+							</label>
+							<label class="irreq-bld-check">
+								<input type="checkbox" id="bldShowEstimate" checked />
+								<?php esc_html_e( 'Show Estimate Section', 'impact-roof-estimate' ); ?>
+							</label>
+							<label class="irreq-bld-check">
+								<input type="checkbox" id="bldShowContact" checked />
+								<?php esc_html_e( 'Show Contact Section', 'impact-roof-estimate' ); ?>
+							</label>
+						</div>
+					</div>
+
+					<!-- Col 2: Estimate Fields -->
+					<div class="irreq-builder-col">
+						<div class="irreq-builder-group">
+							<h3><?php esc_html_e( 'Estimate Fields', 'impact-roof-estimate' ); ?></h3>
+							<table class="irreq-bld-table">
+								<thead>
+									<tr>
+										<th><?php esc_html_e( 'Field', 'impact-roof-estimate' ); ?></th>
+										<th><?php esc_html_e( 'Show', 'impact-roof-estimate' ); ?></th>
+										<th><?php esc_html_e( 'Required', 'impact-roof-estimate' ); ?></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="irreq-bld-estimate-row">
+										<td><?php esc_html_e( 'Roof Size', 'impact-roof-estimate' ); ?></td>
+										<td><input type="checkbox" id="bldShowRoofSize" checked /></td>
+										<td><input type="checkbox" id="bldReqRoofSize" checked /></td>
+									</tr>
+									<tr class="irreq-bld-estimate-row">
+										<td><?php esc_html_e( 'Roof Material', 'impact-roof-estimate' ); ?></td>
+										<td><input type="checkbox" id="bldShowRoofMaterial" checked /></td>
+										<td><input type="checkbox" id="bldReqRoofMaterial" checked /></td>
+									</tr>
+									<tr class="irreq-bld-estimate-row">
+										<td><?php esc_html_e( 'Roof Condition', 'impact-roof-estimate' ); ?></td>
+										<td><input type="checkbox" id="bldShowRoofCondition" checked /></td>
+										<td><input type="checkbox" id="bldReqRoofCondition" checked /></td>
+									</tr>
+									<tr class="irreq-bld-estimate-row">
+										<td><?php esc_html_e( 'Service', 'impact-roof-estimate' ); ?></td>
+										<td><input type="checkbox" id="bldShowService" checked /></td>
+										<td><input type="checkbox" id="bldReqService" checked /></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<!-- Col 3: Contact Fields -->
+					<div class="irreq-builder-col">
+						<div class="irreq-builder-group">
+							<h3><?php esc_html_e( 'Contact Fields', 'impact-roof-estimate' ); ?></h3>
+							<table class="irreq-bld-table">
+								<thead>
+									<tr>
+										<th><?php esc_html_e( 'Field', 'impact-roof-estimate' ); ?></th>
+										<th><?php esc_html_e( 'Show', 'impact-roof-estimate' ); ?></th>
+										<th><?php esc_html_e( 'Required', 'impact-roof-estimate' ); ?></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="irreq-bld-contact-row">
+										<td><?php esc_html_e( 'Name', 'impact-roof-estimate' ); ?></td>
+										<td><input type="checkbox" id="bldShowName" checked /></td>
+										<td><input type="checkbox" id="bldReqName" checked /></td>
+									</tr>
+									<tr class="irreq-bld-contact-row">
+										<td><?php esc_html_e( 'Phone', 'impact-roof-estimate' ); ?></td>
+										<td><input type="checkbox" id="bldShowPhone" checked /></td>
+										<td><input type="checkbox" id="bldReqPhone" checked /></td>
+									</tr>
+									<tr class="irreq-bld-contact-row">
+										<td><?php esc_html_e( 'Email', 'impact-roof-estimate' ); ?></td>
+										<td><input type="checkbox" id="bldShowEmail" checked /></td>
+										<td><input type="checkbox" id="bldReqEmail" checked /></td>
+									</tr>
+									<tr class="irreq-bld-contact-row">
+										<td><?php esc_html_e( 'Address', 'impact-roof-estimate' ); ?></td>
+										<td><input type="checkbox" id="bldShowAddress" <?php checked( $def_address ); ?> /></td>
+										<td><input type="checkbox" id="bldReqAddress" checked /></td>
+									</tr>
+									<tr class="irreq-bld-contact-row">
+										<td><?php esc_html_e( 'Suburb', 'impact-roof-estimate' ); ?></td>
+										<td><input type="checkbox" id="bldShowSuburb" <?php checked( $def_suburb ); ?> /></td>
+										<td><input type="checkbox" id="bldReqSuburb" /></td>
+									</tr>
+									<tr class="irreq-bld-contact-row">
+										<td><?php esc_html_e( 'Details', 'impact-roof-estimate' ); ?></td>
+										<td><input type="checkbox" id="bldShowDetails" <?php checked( $def_details ); ?> /></td>
+										<td><input type="checkbox" id="bldReqDetails" /></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+				</div><!-- .irreq-builder-grid -->
+
+				<div class="irreq-builder-output">
+					<label for="bldOutput"><strong><?php esc_html_e( 'Generated Shortcode', 'impact-roof-estimate' ); ?></strong></label>
+					<div class="irreq-builder-output-row">
+						<input type="text" id="bldOutput" class="irreq-builder-code" readonly value="[roof_estimate_quote]" />
+						<button type="button" id="bldCopyBtn" class="button button-primary">
+							<?php esc_html_e( 'Copy', 'impact-roof-estimate' ); ?>
+						</button>
+					</div>
+					<p class="irreq-section-desc">
+						<?php esc_html_e( 'Paste this shortcode into any page or post to display the form with these settings.', 'impact-roof-estimate' ); ?>
+					</p>
+				</div>
+
+			</div><!-- .irreq-builder-body -->
+		</div><!-- .irreq-builder-panel -->
 		<?php
 	}
 }

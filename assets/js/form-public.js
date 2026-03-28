@@ -3,6 +3,8 @@
  * Frontend calculator + AJAX submission.
  *
  * All configurable values are passed via wp_localize_script as `irreqData`.
+ * Per-form field configuration is encoded as a base64-JSON string in the
+ * data-irreq-config attribute on #irreqFormWrap.
  */
 /* global irreqData, jQuery, turnstile */
 (function ($) {
@@ -29,6 +31,25 @@
   var $formMsg       = $wrap.find('#irreqFormMsg');
   var originalBtnText = $.trim($submitBtn.text());
 
+  /* ── Decode per-form field configuration ─────────────────── */
+  var formConfig = {};
+  var configRaw  = $wrap.attr('data-irreq-config');
+  if (configRaw) {
+    try {
+      formConfig = JSON.parse(atob(configRaw));
+    } catch (e) {
+      formConfig = {};
+    }
+  }
+
+  // Helper: returns true if field is required per config.
+  function isRequired(key) {
+    return formConfig[key] !== false && formConfig[key] !== 0;
+  }
+
+  var showEstimate = formConfig.show_estimate_section !== false && formConfig.show_estimate_section !== 0;
+  var showContact  = formConfig.show_contact_section  !== false && formConfig.show_contact_section  !== 0;
+
   /* ── Utilities ───────────────────────────────────────────── */
   function formatNZD(value) {
     return 'NZ$' + value.toLocaleString('en-NZ', { maximumFractionDigits: 0 });
@@ -49,7 +70,9 @@
     var condition = $conditionSel.val();
 
     if (!size || size <= 0 || !material || !condition) {
-      $estimateText.text(data.i18n.fillFields);
+      if ($estimateText.length) {
+        $estimateText.text(data.i18n.fillFields);
+      }
       lastLow = lastHigh = null;
       return;
     }
@@ -65,53 +88,71 @@
     lastLow  = Math.round(estimate * 0.9);
     lastHigh = Math.round(estimate * 1.1);
 
-    $estimateText.text(
-      formatNZD(lastLow) + ' – ' + formatNZD(lastHigh) +
-      ' (online estimate only, subject to on-site inspection).'
-    );
+    if ($estimateText.length) {
+      $estimateText.text(
+        formatNZD(lastLow) + ' – ' + formatNZD(lastHigh) +
+        ' (online estimate only, subject to on-site inspection).'
+      );
+    }
   }
 
-  $sizeInput.on('input', calculateEstimate);
-  $materialSel.on('change', calculateEstimate);
-  $conditionSel.on('change', calculateEstimate);
+  if ($sizeInput.length)    { $sizeInput.on('input', calculateEstimate); }
+  if ($materialSel.length)  { $materialSel.on('change', calculateEstimate); }
+  if ($conditionSel.length) { $conditionSel.on('change', calculateEstimate); }
 
   /* ── Form submission ─────────────────────────────────────── */
   $submitBtn.on('click', function () {
     $formMsg.hide();
 
-    if (!lastLow || !lastHigh) {
-      showMsg(data.i18n.noEstimate, true);
-      return;
+    // ── Estimate section validation ───────────────────────────
+    if (showEstimate) {
+      if (!lastLow || !lastHigh) {
+        showMsg(data.i18n.noEstimate, true);
+        return;
+      }
+
+      if (isRequired('require_service') && $serviceSel.length && !$serviceSel.val()) {
+        showMsg(data.i18n.noService, true);
+        return;
+      }
     }
 
-    var serviceVal = $serviceSel.val();
-    if (!serviceVal) {
-      showMsg(data.i18n.noService, true);
-      return;
+    // ── Contact section validation ────────────────────────────
+    if (showContact) {
+      var name  = $.trim($nameInput.val());
+      var phone = $.trim($phoneInput.val());
+      var email = $.trim($emailInput.val());
+
+      var needName  = $nameInput.length  && isRequired('require_name');
+      var needPhone = $phoneInput.length && isRequired('require_phone');
+      var needEmail = $emailInput.length && isRequired('require_email');
+
+      if ( (needName && !name) || (needPhone && !phone) ||
+           (needEmail && (!email || !/\S+@\S+\.\S+/.test(email))) ) {
+        showMsg(data.i18n.noContact, true);
+        return;
+      }
+
+      if ($addressInput.length && isRequired('require_address') && !$.trim($addressInput.val())) {
+        showMsg(data.i18n.noAddress, true);
+        return;
+      }
     }
 
-    var name  = $.trim($nameInput.val());
-    var phone = $.trim($phoneInput.val());
-    var email = $.trim($emailInput.val());
+    var name      = $nameInput.length  ? $.trim($nameInput.val())  : '';
+    var phone     = $phoneInput.length ? $.trim($phoneInput.val()) : '';
+    var email     = $emailInput.length ? $.trim($emailInput.val()) : '';
+    var material  = $materialSel.length   ? $materialSel.val()   : '';
+    var condition = $conditionSel.length  ? $conditionSel.val()  : '';
+    var size      = $sizeInput.length     ? $sizeInput.val()     : '';
+    var serviceVal = $serviceSel.length   ? $serviceSel.val()    : '';
+    var address   = $addressInput.length  ? $.trim($addressInput.val())  : '';
+    var suburb    = $suburbInput.length   ? $.trim($suburbInput.val())   : '';
+    var details   = $detailsInput.length  ? $.trim($detailsInput.val())  : '';
 
-    if (!name || !phone || !email) {
-      showMsg(data.i18n.noContact, true);
-      return;
-    }
-
-    if ($addressInput.length && !$.trim($addressInput.val())) {
-      showMsg(data.i18n.noAddress, true);
-      return;
-    }
-
-    var material  = $materialSel.val();
-    var condition = $conditionSel.val();
-    var size      = $sizeInput.val();
-    var address   = $addressInput.length ? $.trim($addressInput.val()) : '';
-    var suburb    = $suburbInput.length  ? $.trim($suburbInput.val())  : '';
-    var details   = $detailsInput.length ? $.trim($detailsInput.val()) : '';
-
-    var estimateStr = formatNZD(lastLow) + ' – ' + formatNZD(lastHigh);
+    var estimateStr = (showEstimate && lastLow && lastHigh)
+      ? formatNZD(lastLow) + ' – ' + formatNZD(lastHigh)
+      : '';
 
     // Collect Turnstile token if widget is present.
     var cfToken = '';
@@ -137,23 +178,27 @@
       details             : details,
       estimate            : estimateStr,
       cf_turnstile_response: cfToken,
+      irreq_form_config   : $wrap.find('[name="irreq_form_config"]').val(),
+      irreq_form_config_hash: $wrap.find('[name="irreq_form_config_hash"]').val(),
     })
     .done(function (response) {
       if (response.success) {
         showMsg(response.data.message, false);
         // Clear the form after success.
-        $sizeInput.val('');
-        $materialSel.val('');
-        $conditionSel.val('');
-        $serviceSel.val('');
-        $nameInput.val('');
-        $phoneInput.val('');
-        $emailInput.val('');
+        if ($sizeInput.length)    $sizeInput.val('');
+        if ($materialSel.length)  $materialSel.val('');
+        if ($conditionSel.length) $conditionSel.val('');
+        if ($serviceSel.length)   $serviceSel.val('');
+        if ($nameInput.length)    $nameInput.val('');
+        if ($phoneInput.length)   $phoneInput.val('');
+        if ($emailInput.length)   $emailInput.val('');
         if ($addressInput.length) $addressInput.val('');
         if ($suburbInput.length)  $suburbInput.val('');
         if ($detailsInput.length) $detailsInput.val('');
         lastLow = lastHigh = null;
-        $estimateText.text(data.i18n.fillFields);
+        if ($estimateText.length) {
+          $estimateText.text(data.i18n.fillFields);
+        }
 
         // Reset Turnstile widget if available.
         if (typeof turnstile !== 'undefined') {
