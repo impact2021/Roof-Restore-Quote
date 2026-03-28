@@ -4,7 +4,7 @@ Tags: roof, estimate, quote, calculator, contact form
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.2.0
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -81,6 +81,16 @@ The JavaScript currently formats amounts as NZD (`NZ$`). To change this, edit `a
 Yes. Leave both Turnstile key fields blank and no CAPTCHA widget will be shown. Nonce-based spam protection is always active.
 
 == Changelog ==
+
+= 1.2.0 =
+* Added optional Property Address, Suburb / Area, and Details fields to the contact form.
+* Each new field can be individually toggled on or off from the admin settings page.
+* Fixed service validation: value is now whitelisted server-side and validated client-side before submission.
+
+= 1.1.0 =
+* Changed Service field from a static read-only input to a dropdown with selectable options.
+* Removed top margin from the form wrapper.
+* Increased padding on input and select fields for improved readability.
 
 = 1.0.0 =
 * Initial release.

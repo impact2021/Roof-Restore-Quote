@@ -17,10 +17,14 @@
   var $sizeInput     = $wrap.find('#rrRoofSize');
   var $materialSel   = $wrap.find('#rrRoofMaterial');
   var $conditionSel  = $wrap.find('#rrRoofCondition');
+  var $serviceSel    = $wrap.find('#rrService');
   var $estimateText  = $wrap.find('#rrEstimateText');
   var $nameInput     = $wrap.find('#rrName');
   var $phoneInput    = $wrap.find('#rrPhone');
   var $emailInput    = $wrap.find('#rrEmail');
+  var $addressInput  = $wrap.find('#rrAddress');
+  var $suburbInput   = $wrap.find('#rrSuburb');
+  var $detailsInput  = $wrap.find('#rrDetails');
   var $submitBtn     = $wrap.find('#irreqSubmitBtn');
   var $formMsg       = $wrap.find('#irreqFormMsg');
   var originalBtnText = $.trim($submitBtn.text());
@@ -80,6 +84,12 @@
       return;
     }
 
+    var serviceVal = $serviceSel.val();
+    if (!serviceVal) {
+      showMsg(data.i18n.noService, true);
+      return;
+    }
+
     var name  = $.trim($nameInput.val());
     var phone = $.trim($phoneInput.val());
     var email = $.trim($emailInput.val());
@@ -89,9 +99,17 @@
       return;
     }
 
+    if ($addressInput.length && !$.trim($addressInput.val())) {
+      showMsg(data.i18n.noAddress, true);
+      return;
+    }
+
     var material  = $materialSel.val();
     var condition = $conditionSel.val();
     var size      = $sizeInput.val();
+    var address   = $addressInput.length ? $.trim($addressInput.val()) : '';
+    var suburb    = $suburbInput.length  ? $.trim($suburbInput.val())  : '';
+    var details   = $detailsInput.length ? $.trim($detailsInput.val()) : '';
 
     var estimateStr = formatNZD(lastLow) + ' – ' + formatNZD(lastHigh);
 
@@ -113,6 +131,10 @@
       roof_size           : size,
       material            : material,
       condition           : condition,
+      service             : serviceVal,
+      address             : address,
+      suburb              : suburb,
+      details             : details,
       estimate            : estimateStr,
       cf_turnstile_response: cfToken,
     })
@@ -123,9 +145,13 @@
         $sizeInput.val('');
         $materialSel.val('');
         $conditionSel.val('');
+        $serviceSel.val('');
         $nameInput.val('');
         $phoneInput.val('');
         $emailInput.val('');
+        if ($addressInput.length) $addressInput.val('');
+        if ($suburbInput.length)  $suburbInput.val('');
+        if ($detailsInput.length) $detailsInput.val('');
         lastLow = lastHigh = null;
         $estimateText.text(data.i18n.fillFields);
 

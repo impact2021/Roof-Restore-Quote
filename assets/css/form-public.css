@@ -6,7 +6,7 @@
 /* Wrapper */
 .rr-quote-wrap {
   max-width: 900px;
-  margin: 50px auto;
+  margin: 0 auto 50px;
   padding: 26px 18px;
   background: #0f1724;
   border-radius: 22px;
@@ -59,11 +59,12 @@
   display: block;
 }
 
-/* ── Inputs & selects – single source of truth ──────────── */
+/* ── Inputs, selects & textarea – single source of truth ── */
 .rr-quote-wrap input,
-.rr-quote-wrap select {
+.rr-quote-wrap select,
+.rr-quote-wrap textarea {
   width: 100%;
-  padding: 12px 14px;
+  padding: 16px 18px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(255, 255, 255, 0.06);
@@ -75,12 +76,14 @@
 }
 
 .rr-quote-wrap input:focus,
-.rr-quote-wrap select:focus {
+.rr-quote-wrap select:focus,
+.rr-quote-wrap textarea:focus {
   outline: none;
   border-color: #db5d33;
 }
 
-.rr-quote-wrap input::placeholder {
+.rr-quote-wrap input::placeholder,
+.rr-quote-wrap textarea::placeholder {
   color: rgba(255, 255, 255, 0.55);
   font-weight: 500;
 }
@@ -88,6 +91,24 @@
 .rr-quote-wrap input:disabled {
   opacity: 0.75;
   cursor: default;
+}
+
+/* ── Textarea-specific ──────────────────────────────────── */
+.rr-quote-wrap textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+/* ── Full-width contact fields ──────────────────────────── */
+.rr-full-field {
+  margin-top: 16px;
+}
+
+/* ── Required field asterisk ────────────────────────────── */
+.rr-required {
+  color: #db5d33;
+  margin-left: 2px;
 }
 
 /* ── Estimate result box ────────────────────────────────── */
@@ -108,6 +129,7 @@
 }
 
 .rr-estimate-box p {
+  font-size: 14px;
   font-weight: 500;
   color: #e8e8e8;
   margin: 0;
@@ -125,11 +147,6 @@
   .rr-contact-grid {
     grid-template-columns: 1fr 1fr;
   }
-}
-
-/* ── Standalone email field ─────────────────────────────── */
-.rr-email-field {
-  margin-top: 16px;
 }
 
 /* ── Cloudflare Turnstile widget ────────────────────────── */

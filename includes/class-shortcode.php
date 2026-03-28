@@ -63,7 +63,9 @@ class IRREQ_Shortcode {
 				'i18n'             => array(
 					'fillFields'  => __( 'Fill in all fields to see your price estimate.', 'impact-roof-estimate' ),
 					'noEstimate'  => __( 'Please complete the roof details to generate an estimate first.', 'impact-roof-estimate' ),
+					'noService'   => __( 'Please select a service.', 'impact-roof-estimate' ),
 					'noContact'   => __( 'Please enter your name, phone number and email so we can confirm your quote.', 'impact-roof-estimate' ),
+					'noAddress'   => __( 'Please enter your property address.', 'impact-roof-estimate' ),
 					'sending'     => __( 'Sending…', 'impact-roof-estimate' ),
 					'error'       => __( 'Something went wrong. Please try again.', 'impact-roof-estimate' ),
 				),
@@ -124,10 +126,13 @@ class IRREQ_Shortcode {
 				</div>
 
 				<div class="rr-quote-group">
-					<label><?php echo esc_html( $s['label_service'] ); ?></label>
-					<input type="text"
-						value="<?php echo esc_attr( $s['service_description'] ); ?>"
-						disabled />
+					<label for="rrService"><?php echo esc_html( $s['label_service'] ); ?></label>
+					<select id="rrService" name="rrService">
+						<option value=""><?php esc_html_e( 'Select service', 'impact-roof-estimate' ); ?></option>
+						<?php foreach ( irreq_get_service_options() as $value => $label ) : ?>
+						<option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></option>
+						<?php endforeach; ?>
+					</select>
 				</div>
 			</div>
 
@@ -151,11 +156,40 @@ class IRREQ_Shortcode {
 				</div>
 			</div>
 
-			<div class="rr-quote-group rr-email-field">
+			<?php if ( ! empty( $s['show_address'] ) ) : ?>
+			<div class="rr-quote-group rr-full-field">
+				<label for="rrAddress">
+					<?php echo esc_html( $s['label_address'] ); ?>
+					<span class="rr-required" aria-hidden="true">*</span>
+				</label>
+				<input type="text" id="rrAddress"
+					placeholder="<?php echo esc_attr( $s['placeholder_address'] ); ?>"
+					autocomplete="street-address" />
+			</div>
+			<?php endif; ?>
+
+			<?php if ( ! empty( $s['show_suburb'] ) ) : ?>
+			<div class="rr-quote-group rr-full-field">
+				<label for="rrSuburb"><?php echo esc_html( $s['label_suburb'] ); ?></label>
+				<input type="text" id="rrSuburb"
+					placeholder="<?php echo esc_attr( $s['placeholder_suburb'] ); ?>"
+					autocomplete="address-level2" />
+			</div>
+			<?php endif; ?>
+
+			<div class="rr-quote-group rr-full-field">
 				<label for="rrEmail"><?php echo esc_html( $s['label_email'] ); ?></label>
 				<input type="email" id="rrEmail"
 					placeholder="<?php echo esc_attr( $s['placeholder_email'] ); ?>" />
 			</div>
+
+			<?php if ( ! empty( $s['show_details'] ) ) : ?>
+			<div class="rr-quote-group rr-full-field">
+				<label for="rrDetails"><?php echo esc_html( $s['label_details'] ); ?></label>
+				<textarea id="rrDetails" rows="4"
+					placeholder="<?php echo esc_attr( $s['placeholder_details'] ); ?>"></textarea>
+			</div>
+			<?php endif; ?>
 
 			<?php if ( ! empty( $s['cf_site_key'] ) ) : ?>
 			<div class="cf-turnstile irreq-turnstile"

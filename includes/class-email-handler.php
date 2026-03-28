@@ -48,6 +48,10 @@ class IRREQ_Email_Handler {
 		$roof_size = isset( $_POST['roof_size'] ) ? floatval( $_POST['roof_size'] ) : 0;
 		$material  = isset( $_POST['material'] ) ? sanitize_text_field( wp_unslash( $_POST['material'] ) ) : '';
 		$condition = isset( $_POST['condition'] ) ? sanitize_text_field( wp_unslash( $_POST['condition'] ) ) : '';
+		$service   = isset( $_POST['service'] ) ? sanitize_text_field( wp_unslash( $_POST['service'] ) ) : '';
+		$address   = isset( $_POST['address'] ) ? sanitize_text_field( wp_unslash( $_POST['address'] ) ) : '';
+		$suburb    = isset( $_POST['suburb'] ) ? sanitize_text_field( wp_unslash( $_POST['suburb'] ) ) : '';
+		$details   = isset( $_POST['details'] ) ? sanitize_textarea_field( wp_unslash( $_POST['details'] ) ) : '';
 		$estimate  = isset( $_POST['estimate'] ) ? sanitize_text_field( wp_unslash( $_POST['estimate'] ) ) : '';
 
 		// Basic validation.
@@ -60,6 +64,18 @@ class IRREQ_Email_Handler {
 		$allowed_conditions = array( 'good', 'average', 'poor' );
 		if ( ! in_array( $material, $allowed_materials, true ) || ! in_array( $condition, $allowed_conditions, true ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid selection.', 'impact-roof-estimate' ) ), 400 );
+		}
+
+		// Whitelist and map service value to label.
+		$service_labels = irreq_get_service_options();
+		if ( ! array_key_exists( $service, $service_labels ) ) {
+			wp_send_json_error( array( 'message' => __( 'Please select a service.', 'impact-roof-estimate' ) ), 400 );
+		}
+		$service_label = $service_labels[ $service ];
+
+		// Validate address if the field is enabled.
+		if ( ! empty( $settings['show_address'] ) && ! $address ) {
+			wp_send_json_error( array( 'message' => __( 'Please enter your property address.', 'impact-roof-estimate' ) ), 400 );
 		}
 
 		// Build human-readable labels.
@@ -92,8 +108,11 @@ class IRREQ_Email_Handler {
 			'roof_size'      => $roof_size,
 			'material_label' => $material_label,
 			'condition_label' => $condition_label,
+			'service_label'  => $service_label,
+			'address'        => $address,
+			'suburb'         => $suburb,
+			'details'        => $details,
 			'estimate'       => $estimate,
-			'service'        => $settings['service_description'],
 		) );
 
 		// Set up email headers.
@@ -158,21 +177,38 @@ class IRREQ_Email_Handler {
 			sprintf( __( 'Phone:           %s', 'impact-roof-estimate' ), $data['phone'] ),
 			/* translators: %s: customer email */
 			sprintf( __( 'Email:           %s', 'impact-roof-estimate' ), $data['email'] ),
-			'',
-			/* translators: %s: roof size in m² */
-			sprintf( __( 'Roof Size:       %s m²', 'impact-roof-estimate' ), $data['roof_size'] ),
-			/* translators: %s: roof material label */
-			sprintf( __( 'Roof Material:   %s', 'impact-roof-estimate' ), $data['material_label'] ),
-			/* translators: %s: roof condition label */
-			sprintf( __( 'Roof Condition:  %s', 'impact-roof-estimate' ), $data['condition_label'] ),
-			'',
-			/* translators: %s: estimate range string */
-			sprintf( __( 'Estimate Range:  %s', 'impact-roof-estimate' ), $data['estimate'] ),
-			/* translators: %s: service description */
-			sprintf( __( 'Service:         %s', 'impact-roof-estimate' ), $data['service'] ),
-			'',
-			__( '(Online estimate only — subject to on-site inspection)', 'impact-roof-estimate' ),
 		);
+
+		if ( ! empty( $data['address'] ) ) {
+			/* translators: %s: property address */
+			$lines[] = sprintf( __( 'Address:         %s', 'impact-roof-estimate' ), $data['address'] );
+		}
+
+		if ( ! empty( $data['suburb'] ) ) {
+			/* translators: %s: suburb or area */
+			$lines[] = sprintf( __( 'Suburb:          %s', 'impact-roof-estimate' ), $data['suburb'] );
+		}
+
+		$lines[] = '';
+		/* translators: %s: roof size in m² */
+		$lines[] = sprintf( __( 'Roof Size:       %s m²', 'impact-roof-estimate' ), $data['roof_size'] );
+		/* translators: %s: roof material label */
+		$lines[] = sprintf( __( 'Roof Material:   %s', 'impact-roof-estimate' ), $data['material_label'] );
+		/* translators: %s: roof condition label */
+		$lines[] = sprintf( __( 'Roof Condition:  %s', 'impact-roof-estimate' ), $data['condition_label'] );
+		/* translators: %s: service label */
+		$lines[] = sprintf( __( 'Service:         %s', 'impact-roof-estimate' ), $data['service_label'] );
+		$lines[] = '';
+		/* translators: %s: estimate range string */
+		$lines[] = sprintf( __( 'Estimate Range:  %s', 'impact-roof-estimate' ), $data['estimate'] );
+		$lines[] = '';
+		$lines[] = __( '(Online estimate only — subject to on-site inspection)', 'impact-roof-estimate' );
+
+		if ( ! empty( $data['details'] ) ) {
+			$lines[] = '';
+			$lines[] = __( 'Additional Details:', 'impact-roof-estimate' );
+			$lines[] = $data['details'];
+		}
 
 		return implode( "\n", $lines );
 	}

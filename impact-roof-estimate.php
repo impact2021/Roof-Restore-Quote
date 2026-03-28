@@ -3,7 +3,7 @@
  * Plugin Name: Impact Websites - Roof Estimate and Quote
  * Plugin URI:  https://impactwebsites.co.nz/
  * Description: Displays an instant roof painting estimate calculator and contact form via shortcode [roof_estimate_quote]. Fully configurable from the admin settings page.
- * Version:     1.0.0
+ * Version:     1.2.0
  * Author:      Impact Websites
  * Author URI:  https://impactwebsites.co.nz/
  * License:     GPL-2.0+
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'IRREQ_VERSION', '1.0.0' );
+define( 'IRREQ_VERSION', '1.2.0' );
 define( 'IRREQ_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'IRREQ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'IRREQ_OPTION_KEY', 'irreq_settings' );
@@ -67,6 +67,17 @@ function irreq_default_settings() {
 		'label_email'                  => 'Email Address',
 		'placeholder_email'            => 'Email Address',
 
+		// Optional extra fields
+		'show_address'                 => '1',
+		'label_address'                => 'Property Address',
+		'placeholder_address'          => 'Street address',
+		'show_suburb'                  => '1',
+		'label_suburb'                 => 'Suburb / Area',
+		'placeholder_suburb'           => 'Suburb or area',
+		'show_details'                 => '1',
+		'label_details'                => 'Details',
+		'placeholder_details'          => 'Any additional details or special requirements…',
+
 		// Cloudflare Turnstile
 		'cf_site_key'                  => '',
 		'cf_secret_key'                => '',
@@ -81,6 +92,23 @@ function irreq_default_settings() {
 function irreq_get_settings() {
 	$saved = get_option( IRREQ_OPTION_KEY, array() );
 	return wp_parse_args( $saved, irreq_default_settings() );
+}
+
+/**
+ * Returns the available service options as value => label pairs.
+ *
+ * Used by both the shortcode renderer and the AJAX email handler to ensure
+ * the option list stays in sync.
+ *
+ * @return array
+ */
+function irreq_get_service_options() {
+	return array(
+		'roof_painting'    => __( 'Roof Painting (incl. clean, moss, primer + 2 top coats)', 'impact-roof-estimate' ),
+		'roof_wash'        => __( 'Roof Wash & Moss Treatment', 'impact-roof-estimate' ),
+		'roof_repairs'     => __( 'Roof Repairs & Patching', 'impact-roof-estimate' ),
+		'full_replacement' => __( 'Full Roof Replacement', 'impact-roof-estimate' ),
+	);
 }
 
 /**
