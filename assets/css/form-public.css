@@ -5,8 +5,8 @@
 
 /* Wrapper */
 .rr-quote-wrap {
-  max-width: 900px;
-  margin: 0 auto 50px;
+  width: 100%;
+  margin: 0 0 50px;
   padding: 26px 18px;
   background: #0f1724;
   border-radius: 22px;
