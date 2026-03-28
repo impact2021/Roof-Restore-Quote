@@ -123,6 +123,15 @@ class IRREQ_Admin_Settings {
 		$this->add_text_field( 'placeholder_phone', __( 'Phone – Placeholder', 'impact-roof-estimate' ), 'irreq_section_fields' );
 		$this->add_text_field( 'label_email', __( 'Email – Label', 'impact-roof-estimate' ), 'irreq_section_fields' );
 		$this->add_text_field( 'placeholder_email', __( 'Email – Placeholder', 'impact-roof-estimate' ), 'irreq_section_fields' );
+		$this->add_checkbox_field( 'show_address', __( 'Property Address – Show field', 'impact-roof-estimate' ), 'irreq_section_fields', __( 'Display the Property Address field (required when shown)', 'impact-roof-estimate' ) );
+		$this->add_text_field( 'label_address', __( 'Property Address – Label', 'impact-roof-estimate' ), 'irreq_section_fields' );
+		$this->add_text_field( 'placeholder_address', __( 'Property Address – Placeholder', 'impact-roof-estimate' ), 'irreq_section_fields' );
+		$this->add_checkbox_field( 'show_suburb', __( 'Suburb / Area – Show field', 'impact-roof-estimate' ), 'irreq_section_fields', __( 'Display the Suburb / Area field', 'impact-roof-estimate' ) );
+		$this->add_text_field( 'label_suburb', __( 'Suburb / Area – Label', 'impact-roof-estimate' ), 'irreq_section_fields' );
+		$this->add_text_field( 'placeholder_suburb', __( 'Suburb / Area – Placeholder', 'impact-roof-estimate' ), 'irreq_section_fields' );
+		$this->add_checkbox_field( 'show_details', __( 'Details – Show field', 'impact-roof-estimate' ), 'irreq_section_fields', __( 'Display the Details message field', 'impact-roof-estimate' ) );
+		$this->add_text_field( 'label_details', __( 'Details – Label', 'impact-roof-estimate' ), 'irreq_section_fields' );
+		$this->add_text_field( 'placeholder_details', __( 'Details – Placeholder', 'impact-roof-estimate' ), 'irreq_section_fields' );
 
 		// ── Section: Cloudflare Turnstile ─────────────────────────────────
 		add_settings_section(
@@ -241,6 +250,25 @@ class IRREQ_Admin_Settings {
 		);
 	}
 
+	/**
+	 * Register and add a checkbox field.
+	 *
+	 * @param string $key         Option key.
+	 * @param string $label       Field label.
+	 * @param string $section     Settings section id.
+	 * @param string $description Optional description shown next to the checkbox.
+	 */
+	private function add_checkbox_field( $key, $label, $section, $description = '' ) {
+		add_settings_field(
+			'irreq_field_' . $key,
+			$label,
+			array( $this, 'render_checkbox_field' ),
+			self::PAGE_SLUG,
+			$section,
+			array( 'key' => $key, 'description' => $description )
+		);
+	}
+
 	/** Render a text input. */
 	public function render_text_field( $args ) {
 		$settings = irreq_get_settings();
@@ -297,6 +325,20 @@ class IRREQ_Admin_Settings {
 		);
 	}
 
+	/** Render a checkbox input. */
+	public function render_checkbox_field( $args ) {
+		$settings = irreq_get_settings();
+		$key      = $args['key'];
+		$desc     = isset( $args['description'] ) ? $args['description'] : '';
+		printf(
+			'<label><input type="checkbox" name="%s[%s]" value="1"%s /> %s</label>',
+			esc_attr( IRREQ_OPTION_KEY ),
+			esc_attr( $key ),
+			checked( ! empty( $settings[ $key ] ), true, false ),
+			esc_html( $desc )
+		);
+	}
+
 	// ── Sanitisation ──────────────────────────────────────────────────────
 
 	/**
@@ -318,6 +360,9 @@ class IRREQ_Admin_Settings {
 			'label_name', 'placeholder_name',
 			'label_phone', 'placeholder_phone',
 			'label_email', 'placeholder_email',
+			'label_address', 'placeholder_address',
+			'label_suburb', 'placeholder_suburb',
+			'label_details', 'placeholder_details',
 			'cf_site_key',
 		);
 
@@ -331,6 +376,12 @@ class IRREQ_Admin_Settings {
 		$output['success_message'] = isset( $input['success_message'] )
 			? sanitize_textarea_field( $input['success_message'] )
 			: $defaults['success_message'];
+
+		// Checkbox fields – absent when unchecked so default to '0'.
+		$checkbox_fields = array( 'show_address', 'show_suburb', 'show_details' );
+		foreach ( $checkbox_fields as $field ) {
+			$output[ $field ] = ! empty( $input[ $field ] ) ? '1' : '0';
+		}
 
 		// Secret key – strip tags only (may contain non-word chars).
 		$output['cf_secret_key'] = isset( $input['cf_secret_key'] )
