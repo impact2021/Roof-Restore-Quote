@@ -7,6 +7,8 @@
  * Supported attributes:
  *   bg_color                – Background hex colour, e.g. "#0f1724".
  *   bg_opacity              – Background opacity 0–1 (default 1).
+ *   title                   – Custom form title (overrides the global setting when provided).
+ *   subtitle                – Custom form subtitle (overrides the global setting when provided).
  *   show_title              – 1/0  Show the form title & subtitle.
  *   show_estimate_section   – 1/0  Show the entire estimate / pricing section.
  *   show_contact_section    – 1/0  Show the entire contact form section.
@@ -140,6 +142,10 @@ class IRREQ_Shortcode {
 				'bg_color'               => '',
 				'bg_opacity'             => '1',
 
+				// Title overrides (empty = use global setting).
+				'title'                  => '',
+				'subtitle'               => '',
+
 				// Sections.
 				'show_title'             => '1',
 				'show_estimate_section'  => '1',
@@ -179,6 +185,10 @@ class IRREQ_Shortcode {
 		$show_title    = $this->atts_bool( $atts['show_title'] );
 		$show_estimate = $this->atts_bool( $atts['show_estimate_section'] );
 		$show_contact  = $this->atts_bool( $atts['show_contact_section'] );
+
+		// ── Title / subtitle: shortcode attr overrides global setting ─────
+		$form_title    = '' !== $atts['title']    ? $atts['title']    : $s['form_title'];
+		$form_subtitle = '' !== $atts['subtitle'] ? $atts['subtitle'] : $s['form_subtitle'];
 
 		// ── Estimate fields (hidden when section is hidden) ───────────────
 		$show_roof_size         = $show_estimate && $this->atts_bool( $atts['show_roof_size'] );
@@ -258,8 +268,8 @@ class IRREQ_Shortcode {
 			<?php if ( $wrap_style ) : ?>style="<?php echo esc_attr( $wrap_style ); ?>"<?php endif; ?>>
 
 			<?php if ( $show_title ) : ?>
-			<div class="rr-quote-title"><?php echo esc_html( $s['form_title'] ); ?></div>
-			<div class="rr-quote-sub"><?php echo esc_html( $s['form_subtitle'] ); ?></div>
+			<div class="rr-quote-title"><?php echo esc_html( $form_title ); ?></div>
+			<div class="rr-quote-sub"><?php echo esc_html( $form_subtitle ); ?></div>
 			<?php endif; ?>
 
 			<?php if ( $show_estimate ) : ?>
