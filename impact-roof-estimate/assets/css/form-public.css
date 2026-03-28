@@ -1,0 +1,184 @@
+/* =========================================================
+   Impact Websites – Roof Estimate & Quote
+   Public-facing form styles (mobile-first)
+   ========================================================= */
+
+/* Wrapper */
+.rr-quote-wrap {
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 26px 18px;
+  background: #0f1724;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+/* ── Titles ─────────────────────────────────────────────── */
+.rr-quote-title {
+  font-size: clamp(24px, 4vw, 32px);
+  font-weight: 800;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.rr-quote-sub {
+  font-size: clamp(15px, 3.2vw, 18px);
+  color: #d0d0d0;
+  margin-bottom: 22px;
+  font-weight: 500;
+}
+
+/* ── Main estimate grid (mobile: 1 col → 2 col) ─────────── */
+.rr-quote-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+@media (min-width: 800px) {
+  .rr-quote-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+  }
+}
+
+/* ── Groups & labels ────────────────────────────────────── */
+.rr-quote-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.rr-quote-group label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* ── Inputs & selects – single source of truth ──────────── */
+.rr-quote-wrap input,
+.rr-quote-wrap select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.rr-quote-wrap input:focus,
+.rr-quote-wrap select:focus {
+  outline: none;
+  border-color: #db5d33;
+}
+
+.rr-quote-wrap input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
+}
+
+.rr-quote-wrap input:disabled {
+  opacity: 0.75;
+  cursor: default;
+}
+
+/* ── Estimate result box ────────────────────────────────── */
+.rr-estimate-box {
+  margin-top: 28px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 22px;
+  text-align: center;
+}
+
+.rr-estimate-box h3 {
+  color: #db5d33;
+  font-size: 22px;
+  margin: 0 0 6px;
+  font-weight: 800;
+}
+
+.rr-estimate-box p {
+  font-weight: 500;
+  color: #e8e8e8;
+  margin: 0;
+}
+
+/* ── Contact fields grid ────────────────────────────────── */
+.rr-contact-grid {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 800px) {
+  .rr-contact-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── Standalone email field ─────────────────────────────── */
+.rr-email-field {
+  margin-top: 16px;
+}
+
+/* ── Cloudflare Turnstile widget ────────────────────────── */
+.irreq-turnstile {
+  margin-top: 18px;
+}
+
+/* ── Inline form message (success / error) ──────────────── */
+.irreq-form-msg {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.irreq-form-msg.irreq-success {
+  background: rgba(46, 160, 67, 0.2);
+  border: 1px solid rgba(46, 160, 67, 0.5);
+  color: #7ee787;
+}
+
+.irreq-form-msg.irreq-error {
+  background: rgba(218, 54, 51, 0.2);
+  border: 1px solid rgba(218, 54, 51, 0.5);
+  color: #f85149;
+}
+
+/* ── Submit button ──────────────────────────────────────── */
+.rr-submit-btn {
+  width: 100%;
+  margin-top: 18px;
+  padding: 15px 0;
+  border-radius: 12px;
+  background: #db5d33;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s ease, opacity 0.2s ease;
+}
+
+.rr-submit-btn:hover:not(:disabled) {
+  background: #ff6f42;
+}
+
+.rr-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
